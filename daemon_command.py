@@ -1,4 +1,3 @@
-import os
 from optparse import make_option
 import signal
 from django.core.management.base import NoArgsCommand
@@ -21,8 +20,8 @@ class DaemonCommand(NoArgsCommand):
     requires_model_validation = True
     WORKDIR = '.'
     UMASK = 0
-    PID_FILE = '{}.pid'.format(os.path.splitext(__file__)[0])
-    LOGFILE = '{}.log'.format(os.path.splitext(__file__)[0])
+    PID_FILE = 'daemon_command.pid'
+    LOGFILE = 'daemon_command.log'
     STDOUT = '/dev/null'
     STDERR = STDOUT
 
