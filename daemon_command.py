@@ -40,7 +40,7 @@ class DaemonCommand(NoArgsCommand):
                             ' directory to which the process should change on'
                             ' daemon start.')
         parser.add_argument('--umask', action='store', dest='umask',
-                            default=self.UMASK, type='int',
+                            default=self.UMASK, type=int,
                             help='File access creation mask ("umask") to set'
                             ' for the process on daemon start.')
         parser.add_argument('--pidfile', action='store', dest='pid_file',
