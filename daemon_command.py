@@ -25,30 +25,34 @@ class DaemonCommand(NoArgsCommand):
     STDOUT = '/dev/null'
     STDERR = STDOUT
 
-    option_list = NoArgsCommand.option_list + (
-        make_option('--start', action='store_const', const='start', dest='action',
-                    help='Start the daemon'),
-        make_option('--stop', action='store_const', const='stop', dest='action',
-                    help='Stop the daemon'),
-        make_option('--restart', action='store_const', const='restart', dest='action',
-                    help='Stop and restart the daemon'),
-        make_option('--status', action='store_const', const='status', dest='action',
-                    help='Report whether the daemon is currently running or stopped'),
-        make_option('--workdir', action='store', dest='workdir', default=WORKDIR,
-            help='Full path of the working directory to which the process should '
-            'change on daemon start.'),
-        make_option('--umask', action='store', dest='umask', default=UMASK, type="int",
-            help='File access creation mask ("umask") to set for the process on '
-            'daemon start.'),
-        make_option('--pidfile', action='store', dest='pid_file', 
-                    default=PID_FILE, help='PID filename.'),
-        make_option('--logfile', action='store', dest='log_file',
-                    default=LOGFILE, help='Path to log file'),
-        make_option('--stdout', action='store', dest='stdout', default=STDOUT,
-                    help='Destination to redirect standard out'),
-        make_option('--stderr', action='store', dest='stderr', default=STDERR,
-                    help='Destination to redirect standard error'),
-    )
+    def add_arguments(self, parser):
+        parser.add_argument('--start', action='store_const', const='start',
+                            dest='action', help='Start the daemon')
+        parser.add_argument('--stop', action='store_const', const='stop',
+                            dest='action', help='Stop the daemon')
+        parser.add_argument('--restart', action='store_const', const='restart',
+                            dest='action', help='Stop and restart the daemon')
+        parser.add_argument('--status', action='store_const', const='status',
+                            dest='action', help='Report whether the daemon is'
+                            ' currently running or stopped')
+        parser.add_argument('--workdir', action='store', dest='workdir',
+                            default=self.WORKDIR, help='Full path of the working'
+                            ' directory to which the process should change on'
+                            ' daemon start.')
+        parser.add_argument('--umask', action='store', dest='umask',
+                            default=self.UMASK, type='int',
+                            help='File access creation mask ("umask") to set'
+                            ' for the process on daemon start.')
+        parser.add_argument('--pidfile', action='store', dest='pid_file',
+                            default=self.PID_FILE, help='PID filename.')
+        parser.add_argument('--logfile', action='store', dest='log_file',
+                            default=self.LOGFILE, help='Path to log file')
+        parser.add_argument('--stdout', action='store', dest='stdout',
+                            default=self.STDOUT, help='Destination to redirect'
+                            ' standard out')
+        parser.add_argument('--stderr', action='store', dest='stderr',
+                            default=self.STDERR, help='Destination to redirect'
+                            ' standard error')
 
 
     def loop_callback(self):
