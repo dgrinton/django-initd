@@ -19,6 +19,7 @@ class Initd(object):
         self.umask = umask
         self.stdout = stdout
         self.stderr = stderr
+        self.full_pid_file = os.path.join(self.workdir, self.pid_file)
 
     def start(self, run, exit=None):
         """
@@ -30,8 +31,8 @@ class Initd(object):
 
         """
         # if there's already a pid file, check if process is running
-        if os.path.exists(self.pid_file):
-            with open(self.pid_file, 'r') as stream:
+        if os.path.exists(self.full_pid_file):
+            with open(self.full_pid_file, 'r') as stream:
                 pid = int(stream.read())
             try:
                 # sending 0 signal doesn't do anything to live process, but 
@@ -47,7 +48,7 @@ class Initd(object):
         become_daemon(self.workdir, self.stdout, self.stderr, self.umask)
 
         _initialize_logging(self.log_file)
-        _create_pid_file(self.pid_file)
+        _create_pid_file(self.full_pid_file)
 
         # workaround for closure issue is putting running flag in array
         running = [True]
@@ -90,7 +91,7 @@ class Initd(object):
                 except Exception, exc: # pylint: disable-msg=W0703
                     logging.exception(exc)
         finally:
-            os.remove(self.pid_file)
+            os.remove(self.full_pid_file)
             logging.info('Exiting.')
 
 
@@ -101,7 +102,7 @@ class Initd(object):
         the running process stops running.
         """
         try:
-            with open(self.pid_file, 'r') as stream:
+            with open(self.full_pid_file, 'r') as stream:
                 pid = int(stream.read())
         except IOError as ioe:
             if ioe.errno != errno.ENOENT:
@@ -111,7 +112,7 @@ class Initd(object):
         sys.stdout.write('Stopping.')
         sys.stdout.flush()
         os.kill(pid, signal.SIGTERM)
-        while os.path.exists(self.pid_file):
+        while os.path.exists(self.full_pid_file):
             sys.stdout.write('.')
             sys.stdout.flush()
             time.sleep(0.5)
@@ -126,8 +127,8 @@ class Initd(object):
         Arguments:
         * run:function - The command to run (repeatedly) within the daemon.
         """
-        if os.path.exists(self.pid_file):
-            self.stop(self.pid_file)
+        if os.path.exists(self.full_pid_file):
+            self.stop(self.full_pid_file)
         print 'Starting.'
         self.start(run, exit=exit)
 
@@ -137,7 +138,7 @@ class Initd(object):
         Prints the daemon's status:
         'Running.' if is started, 'Stopped.' if it is stopped.
         """
-        if os.path.exists(self.pid_file):
+        if os.path.exists(self.full_pid_file):
             sys.stdout.write('Running.\n')
         else:
             sys.stdout.write('Stopped.\n')
