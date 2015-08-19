@@ -164,7 +164,7 @@ def _initialize_logging(log_file):
         logging.basicConfig(level=logging.INFO,
                             format='%(asctime)s %(levelname)s %(message)s',
                             filename=log_file,
-                            filemode='w')
+                            filemode='a')
 
 
 def _create_pid_file(pid_file):
