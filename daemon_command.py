@@ -62,6 +62,7 @@ class DaemonCommand(NoArgsCommand):
         pass
 
     def handle_noargs(self, **options):
+        self.options = options
         action = options.pop('action', None)
         
         if action:
