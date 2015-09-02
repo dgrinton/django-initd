@@ -20,6 +20,7 @@ class Initd(object):
         self.stdout = stdout
         self.stderr = stderr
         self.full_pid_file = os.path.join(self.workdir, self.pid_file)
+        self.full_log_file = os.path.join(self.workdir, self.log_file)
 
     def start(self, run, exit=None):
         """
@@ -47,7 +48,7 @@ class Initd(object):
         from django.utils.daemonize import become_daemon
         become_daemon(self.workdir, self.stdout, self.stderr, self.umask)
 
-        _initialize_logging(self.log_file)
+        _initialize_logging(self.full_log_file)
         _create_pid_file(self.full_pid_file)
 
         # workaround for closure issue is putting running flag in array
