@@ -112,7 +112,11 @@ class Initd(object):
             return
         sys.stdout.write('Stopping.')
         sys.stdout.flush()
-        os.kill(pid, signal.SIGTERM)
+        try:
+            os.kill(pid, signal.SIGTERM)
+        except OSError:
+            # assume process wasnt running, remove pid file
+            os.unlink(self.full_pid_file)
         while os.path.exists(self.full_pid_file):
             sys.stdout.write('.')
             sys.stdout.flush()
