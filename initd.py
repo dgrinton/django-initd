@@ -12,7 +12,7 @@ __all__ = ['start', 'stop', 'restart', 'status', 'execute']
 
 class Initd(object):
     def __init__(self, log_file='', pid_file='', workdir='', umask='', 
-                 stdout='', stderr='', **kwargs):
+                 stdout='', stderr='', force=False, **kwargs):
         self.log_file = log_file
         self.pid_file = pid_file
         self.workdir = workdir
@@ -21,7 +21,7 @@ class Initd(object):
         self.stderr = stderr
         self.full_pid_file = os.path.join(self.workdir, self.pid_file)
         self.full_log_file = os.path.join(self.workdir, self.log_file)
-        self.force = kwargs.get('force')
+        self.force = force
 
     def start(self, run, exit=None):
         """
@@ -119,20 +119,27 @@ class Initd(object):
             # assume process wasnt running, remove pid file
             os.unlink(self.full_pid_file)
 
-        if self.force:
-            # check if it's still running and send SIGKILL
-            try:
-                os.kill(pid, 0)
-                os.kill(pid, signal.SIGKILL)
-                sys.stdout.write('Killed.')
-                sys.stdout.flush()
-            except OSError:
-                pass
-
+        start = time.time()
         while os.path.exists(self.full_pid_file):
             sys.stdout.write('.')
             sys.stdout.flush()
             time.sleep(0.5)
+            if time.time() - start > 5 and self.force:
+                sys.stdout.write('time\'s up.')
+                try:
+                    os.kill(pid, 0)
+                except OSError:
+                    print 'already dead'
+                else:
+                    try:
+                        os.kill(pid, signal.SIGKILL)
+                        sys.stdout.write(' Killed.')
+                        sys.stdout.flush()
+                    except OSError:
+                        print 'couldnt kill'
+                        pass
+                os.unlink(self.full_pid_file)
+
         sys.stdout.write('\n')
 
 
