@@ -53,7 +53,7 @@ class DaemonCommand(NoArgsCommand):
         parser.add_argument('--stderr', action='store', dest='stderr',
                             default=self.STDERR, help='Destination to redirect'
                             ' standard error')
-        parser.add_argument('--force', action='store', dest='force',
+        parser.add_argument('--force', action='store_true', dest='force',
                             default=False, help='SIGKILL process if it won\'t'
                             ' terminate on SIGTERM')
 
