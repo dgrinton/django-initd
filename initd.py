@@ -19,7 +19,7 @@ class Initd(object):
     # pylint: disable=too-many-arguments, too-many-instance-attributes
 
     def __init__(self, log_file='', pid_file='', workdir='', umask='',
-                 stdout='', stderr='', force=False, **kwargs):
+                 stdout='', stderr='', force=True, **kwargs):
         self.log_file = log_file
         self.pid_file = pid_file
         self.workdir = workdir
