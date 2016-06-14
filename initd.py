@@ -126,6 +126,7 @@ class Initd(object):
                 os.kill(pid, signal.SIGKILL)
                 sys.stdout.write('Killed.')
                 sys.stdout.flush()
+                os.unlink(self.full_pid_file)
             except OSError:
                 pass
 
