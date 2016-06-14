@@ -6,13 +6,20 @@ Use this in conjunction with the DaemonCommand management command base class.
 
 from __future__ import with_statement
 
-import logging, os, signal, sys, time, errno
+import logging
+import os
+import signal
+import sys
+import time
+import errno
 
 __all__ = ['start', 'stop', 'restart', 'status', 'execute']
 
 class Initd(object):
-    def __init__(self, log_file='', pid_file='', workdir='', umask='', 
-                 stdout='', stderr='', **kwargs):
+    # pylint: disable=too-many-arguments, too-many-instance-attributes
+
+    def __init__(self, log_file='', pid_file='', workdir='', umask='',
+                 stdout='', stderr='', force=False, **kwargs):
         self.log_file = log_file
         self.pid_file = pid_file
         self.workdir = workdir
@@ -21,9 +28,9 @@ class Initd(object):
         self.stderr = stderr
         self.full_pid_file = os.path.join(self.workdir, self.pid_file)
         self.full_log_file = os.path.join(self.workdir, self.log_file)
-        self.force = kwargs.get('force')
+        self.force = force
 
-    def start(self, run, exit=None):
+    def start(self, run, _exit=None):
         """
         Starts the daemon.  This daemonizes the process, so the calling process
         will just exit normally.
@@ -37,7 +44,7 @@ class Initd(object):
             with open(self.full_pid_file, 'r') as stream:
                 pid = int(stream.read())
             try:
-                # sending 0 signal doesn't do anything to live process, but 
+                # sending 0 signal doesn't do anything to live process, but
                 # will raise error if process doesn't exist
                 os.kill(pid, 0)
             except OSError:
@@ -58,14 +65,14 @@ class Initd(object):
             """
             Invoked when the daemon is stopping.  Tries to stop gracefully
             before forcing termination.
-            
+
             The arguments of this function are ignored, they only exist to
             provide compatibility for a signal handler.
 
             """
-            if exit:
+            if _exit:
                 logging.debug('Calling exit handler')
-                exit()
+                _exit()
             running[0] = False
             def cb_alrm_handler(sig, frame):
                 """
@@ -97,7 +104,7 @@ class Initd(object):
             logging.info('Exiting.')
 
 
-    def stop(self, run=None, exit=None):
+    def stop(self, run=None, _exit=None):
         """
         Stops the daemon.  This reads from the pid file, and sends the SIGTERM
         signal to the process with that as its pid.  This will also wait until
@@ -130,14 +137,30 @@ class Initd(object):
             except OSError:
                 pass
 
+        start = time.time()
         while os.path.exists(self.full_pid_file):
             sys.stdout.write('.')
             sys.stdout.flush()
             time.sleep(0.5)
+            if time.time() - start > 5 and self.force:
+                sys.stdout.write('time\'s up.')
+                try:
+                    os.kill(pid, 0)
+                except OSError:
+                    print 'already dead'
+                else:
+                    try:
+                        os.kill(pid, signal.SIGKILL)
+                        sys.stdout.write(' Killed.')
+                        sys.stdout.flush()
+                    except OSError:
+                        print 'couldnt kill'
+                os.unlink(self.full_pid_file)
+
         sys.stdout.write('\n')
 
 
-    def restart(self, run, exit=None):
+    def restart(self, run, _exit=None):
         """
         Restarts the daemon.  This simply calls stop (if the process is running)
         and then start again.
@@ -148,10 +171,10 @@ class Initd(object):
         if os.path.exists(self.full_pid_file):
             self.stop(self.full_pid_file)
         print 'Starting.'
-        self.start(run, exit=exit)
+        self.start(run, _exit=_exit)
 
 
-    def status(self, run=None, exit=None):
+    def status(self, run=None, _exit=None):
         """
         Prints the daemon's status:
         'Running.' if is started, 'Stopped.' if it is stopped.
@@ -163,16 +186,16 @@ class Initd(object):
         sys.stdout.flush()
 
 
-    def execute(self, action, run=None, exit=None):
+    def execute(self, action, run=None, _exit=None):
         cmd = getattr(self, action)
-        cmd(run, exit)
+        cmd(run, _exit)
 
 
 def _initialize_logging(log_file):
     """
     Initializes logging if a log_file parameter is specified in config
     config.  Otherwise does not set up any log.
-    
+
     Arguments:
     * log_file:str - The path to the log file, or None if no logging
                      should take place.
