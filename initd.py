@@ -30,7 +30,7 @@ class Initd(object):
         self.full_log_file = os.path.join(self.workdir, self.log_file)
         self.force = force
 
-    def start(self, run, _exit=None):
+    def start(self, run, exit=None):
         """
         Starts the daemon.  This daemonizes the process, so the calling process
         will just exit normally.
@@ -70,9 +70,9 @@ class Initd(object):
             provide compatibility for a signal handler.
 
             """
-            if _exit:
+            if exit:
                 logging.debug('Calling exit handler')
-                _exit()
+                exit()
             running[0] = False
             def cb_alrm_handler(sig, frame):
                 """
@@ -104,7 +104,7 @@ class Initd(object):
             logging.info('Exiting.')
 
 
-    def stop(self, run=None, _exit=None):
+    def stop(self, run=None, exit=None):
         """
         Stops the daemon.  This reads from the pid file, and sends the SIGTERM
         signal to the process with that as its pid.  This will also wait until
@@ -149,7 +149,7 @@ class Initd(object):
         sys.stdout.write('\n')
 
 
-    def restart(self, run, _exit=None):
+    def restart(self, run, exit=None):
         """
         Restarts the daemon.  This simply calls stop (if the process is running)
         and then start again.
@@ -160,10 +160,10 @@ class Initd(object):
         if os.path.exists(self.full_pid_file):
             self.stop(self.full_pid_file)
         print 'Starting.'
-        self.start(run, _exit=_exit)
+        self.start(run, exit=exit)
 
 
-    def status(self, run=None, _exit=None):
+    def status(self, run=None, exit=None):
         """
         Prints the daemon's status:
         'Running.' if is started, 'Stopped.' if it is stopped.
@@ -175,9 +175,9 @@ class Initd(object):
         sys.stdout.flush()
 
 
-    def execute(self, action, run=None, _exit=None):
+    def execute(self, action, run=None, exit=None):
         cmd = getattr(self, action)
-        cmd(run, _exit)
+        cmd(run, exit)
 
 
 def _initialize_logging(log_file):
