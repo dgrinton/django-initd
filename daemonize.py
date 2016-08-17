@@ -1,7 +1,7 @@
 import os
 import sys
 
-from . import six
+from django.utils import six
 
 buffering = int(six.PY3)        # No unbuffered text I/O on Python 3 (#20815).
 
