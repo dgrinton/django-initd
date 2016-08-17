@@ -56,7 +56,7 @@ class Initd(object):
         try:
             from django.utils.daemonize import become_daemon
         except ImportError: # Django >= 1.9
-            from .daemonize import become_daemon
+            from daemonize import become_daemon
 
         become_daemon(self.workdir, self.stdout, self.stderr, self.umask)
 
