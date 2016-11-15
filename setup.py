@@ -12,8 +12,8 @@ doclines = __doc__.splitlines()
 
 setup(
     name = 'django-initd',
-    version = '0.0.2',
-    py_modules = ['initd', 'daemon_command'],
+    version = '0.0.2dev4',
+    py_modules = ['initd', 'daemon_command', 'daemonize'],
     platforms = ['POSIX'],
 
     install_requires = ['django>=1.0'],

@@ -53,7 +53,11 @@ class Initd(object):
                 logging.warn('Daemon already running.')
                 return
 
-        from django.utils.daemonize import become_daemon
+        try:
+            from django.utils.daemonize import become_daemon
+        except ImportError: # Django >= 1.9
+            from daemonize import become_daemon
+
         become_daemon(self.workdir, self.stdout, self.stderr, self.umask)
 
         _initialize_logging(self.full_log_file)
