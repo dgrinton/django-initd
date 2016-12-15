@@ -1,9 +1,9 @@
 from optparse import make_option
 import signal
-from django.core.management.base import NoArgsCommand
+from django.core.management.base import BaseCommand
 from initd import Initd
 
-class DaemonCommand(NoArgsCommand):
+class DaemonCommand(BaseCommand):
     """
     Run a management command as a daemon.
 
