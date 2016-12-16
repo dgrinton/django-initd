@@ -1,19 +1,19 @@
-from optparse import make_option
 import signal
 from django.core.management.base import BaseCommand
 from initd import Initd
+
 
 class DaemonCommand(BaseCommand):
     """
     Run a management command as a daemon.
 
-    Subclass this and override the `loop_callback` method with the code the 
-    daemon process should run. Optionally, override `exit_callback` with 
+    Subclass this and override the `loop_callback` method with the code the
+    daemon process should run. Optionally, override `exit_callback` with
     code to run when the process is stopped.
 
     Alternatively, if your code has more complex setup/shutdown requirements,
-    override `handle_noargs` along the lines of the basic version here. 
-    
+    override `handle_noargs` along the lines of the basic version here.
+
     Pass one of --start, --stop, --restart or --status to work as a daemon.
     Otherwise, the command will run as a standard application.
     """
@@ -57,7 +57,6 @@ class DaemonCommand(BaseCommand):
                             default=False, help='SIGKILL process if it won\'t'
                             ' terminate on SIGTERM')
 
-
     def loop_callback(self):
         raise NotImplementedError
 
@@ -67,7 +66,7 @@ class DaemonCommand(BaseCommand):
     def handle_noargs(self, **options):
         self.options = options
         action = options.pop('action', None)
-        
+
         if action:
             # daemonizing so set up functions to call while running and at close
             daemon = Initd(**options)
