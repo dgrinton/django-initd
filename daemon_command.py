@@ -63,7 +63,7 @@ class DaemonCommand(BaseCommand):
     def exit_callback(self):
         pass
 
-    def handle_noargs(self, **options):
+    def handle(self, **options):
         self.options = options
         action = options.pop('action', None)
 
