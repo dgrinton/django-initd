@@ -140,14 +140,14 @@ class Initd(object):
                 try:
                     os.kill(pid, 0)
                 except OSError:
-                    print 'already dead'
+                    print('already dead')
                 else:
                     try:
                         os.kill(pid, signal.SIGKILL)
                         sys.stdout.write(' Killed.')
                         sys.stdout.flush()
                     except OSError:
-                        print 'couldnt kill'
+                        print('couldnt kill')
                 os.unlink(self.full_pid_file)
 
         sys.stdout.write('\n')
@@ -163,7 +163,7 @@ class Initd(object):
         """
         if os.path.exists(self.full_pid_file):
             self.stop(self.full_pid_file)
-        print 'Starting.'
+        print('Starting.')
         self.start(run, exit=exit)
 
 
